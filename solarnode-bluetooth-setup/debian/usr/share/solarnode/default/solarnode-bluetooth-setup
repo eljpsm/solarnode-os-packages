@@ -1,2 +1,5 @@
 # Disable configuration of setup user
 # CFG_WITHOUT_SETUP_USER=1
+
+# Keep the Bluetooth setup peripheral enabled and running at all times.
+# CFG_BT_SETUP_ALWAYS_ON=1

@@ -12,4 +12,8 @@ service_down () {
 if [ "$1" = "remove" ]; then
 	service_down solarnode-bt-setup-peripheral-restart.path
 	service_down solarnode-bt-setup-peripheral
+	# the peripheral is normally disabled but may be running on demand
+	if [ -x /usr/share/solarnode/cfg.d/bluetooth.sh ]; then
+		/usr/share/solarnode/cfg.d/bluetooth.sh disable || true
+	fi
 fi

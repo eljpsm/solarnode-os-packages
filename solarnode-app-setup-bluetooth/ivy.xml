@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	This is a SolarNode deployment configuration for Bluetooth setup plugins.
+-->
+<ivy-module version="2.0">
+	<info organisation="SolarNetwork" module="SolarNode-Setup-Bluetooth"/>
+	<configurations>
+		<conf name="runtime" visibility="public" description="The Runtime"/>
+	</configurations>
+	<dependencies defaultconfmapping="runtime->default(runtime)">
+
+		<dependency org="net.solarnetwork.node" name="net.solarnetwork.node.setup.bluetooth" rev="1.0.0"/>
+
+		<!-- solarnode-app-core excludes -->
+		<exclude artifact="net.solarnetwork.common"/>
+		<exclude artifact="net.solarnetwork.common.osgi"/>
+		<exclude artifact="net.solarnetwork.common.web"/>
+		<exclude artifact="net.solarnetwork.node"/>
+
+		<!-- Global excludes provided by the base system -->
+		<exclude org="commons-(beanutils|codec|collections|digester|fileupload|io)" matcher="regexp"/>
+		<exclude org="com.amazonaws"/>
+		<exclude org="com.fasterxml.jackson.core"/>
+		<exclude org="com.fasterxml.jackson.dataformat"/>
+		<exclude org="com.fasterxml.jackson.datatype"/>
+		<exclude org="de.siegmar"/>
+		<exclude org="javax.servlet"/>
+		<exclude org="joda-time"/>
+		<exclude org="net.java.dev.jna"/>
+		<exclude org="net.sf.supercsv"/>
+		<exclude org="org.apache.commons"/>
+		<exclude org="org.apache.tomcat"/>
+		<exclude org="org.eclipse.paho"/>
+		<exclude org="org.jspecify"/>
+		<exclude org="org.osgi"/>
+		<exclude org="org.quartz-scheduler"/>
+		<exclude org="org.slf4j"/>
+		<exclude org="org.springframework"/>
+		<exclude org="org.springframework.security"/>
+		<exclude org="org.mitre.dsmiley.httpproxy"/>
+		<exclude org="tools.jackson.core"/>
+		<exclude org="tools.jackson.dataformat"/>
+	</dependencies>
+</ivy-module>

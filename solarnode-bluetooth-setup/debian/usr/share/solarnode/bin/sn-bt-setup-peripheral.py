@@ -892,6 +892,14 @@ def main() -> int:
                 logger.info("%s unregistered", name)
             except dbus.exceptions.DBusException as e:
                 logger.warning("Failed to unregister %s: %s", name, e)
+        # The radio is only meant to be reachable while this peripheral runs,
+        # so leave the adapter off (not discoverable, not pairable, not
+        # powered) rather than lingering in the state set_state(True) put it
+        # in at startup.
+        try:
+            set_state(False, adapter_props)
+        except dbus.exceptions.DBusException as e:
+            logger.warning("Failed to turn adapter off: %s", e)
         logger.info("Shutdown complete")
 
     return exit_status

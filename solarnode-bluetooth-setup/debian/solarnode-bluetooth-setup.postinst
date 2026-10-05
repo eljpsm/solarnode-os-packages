@@ -67,4 +67,15 @@ fi
 
 systemctl daemon-reload || true
 service_up solarnode-bt-setup-peripheral-restart.path true
-service_up solarnode-bt-setup-peripheral true
+
+# The peripheral is on-demand by default: left disabled and stopped here, and
+# turned on only when needed via `solarcfg bluetooth enable`.
+if [ "$CFG_BT_SETUP_ALWAYS_ON" = "1" ]; then
+	service_up solarnode-bt-setup-peripheral true
+else
+	if systemctl is-enabled solarnode-bt-setup-peripheral >/dev/null 2>&1; then
+		echo "Disabling solarnode-bt-setup-peripheral (radio is on-demand)..."
+		systemctl disable solarnode-bt-setup-peripheral || true
+	fi
+	/usr/share/solarnode/cfg.d/bluetooth.sh disable || true
+fi

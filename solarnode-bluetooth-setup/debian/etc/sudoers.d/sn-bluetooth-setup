@@ -1,0 +1,1 @@
+solar ALL = (root) NOPASSWD: /usr/share/solarnode/cfg.d/bluetooth.sh

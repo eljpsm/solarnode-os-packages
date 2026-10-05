@@ -5,4 +5,7 @@ Description=SolarNode Bluetooth Setup peripheral restart
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/systemctl restart solarnode-bt-setup-peripheral.service
+# try-restart, not restart: the peripheral is started on demand (see
+# solarcfg bluetooth enable), so an identity change must not start it when it
+# has intentionally been left stopped.
+ExecStart=/usr/bin/systemctl try-restart solarnode-bt-setup-peripheral.service
