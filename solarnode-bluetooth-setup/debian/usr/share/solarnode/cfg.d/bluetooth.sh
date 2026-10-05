@@ -15,22 +15,61 @@
 #								"powered: true|false" are the Bluetooth adapter state;
 #								"adapter: hciN" is the adapter name. Always exits 0.
 #   enable/disable/restart	->	human-readable result lines on STDOUT; errors on
-#              					STDERR with a non-zero exit code.
+#              					STDERR with a non-zero exit code. restart only
+#              					restarts a running peripheral; it never starts one.
 #
 # Exit codes: 0 success, 1 unsupported action, 3 systemctl failure.
+#
+# Adapter selection (the same rule as sn-bt-setup-peripheral.py): the
+# SN_BT_SETUP_PERIPHERAL_ADAPTER value from /etc/solarnode/bluetooth-setup.env
+# if set and valid, otherwise the first adapter that provides
+# org.bluez.GattManager1, otherwise hci0.
 
 CONF="/usr/share/solarnode/default/solarnode-bluetooth-setup"
 VENDOR_CONF="/etc/default/solarnode-bluetooth-setup"
 ENV_FILE="/etc/solarnode/bluetooth-setup.env"
 [ -e "$CONF" ] && . "$CONF"
 [ -e "$VENDOR_CONF" ] && . "$VENDOR_CONF"
-[ -e "$ENV_FILE" ] && . "$ENV_FILE"
 
-ADAPTER="${SN_BT_SETUP_PERIPHERAL_ADAPTER:-hci0}"
 UNIT="solarnode-bt-setup-peripheral.service"
 
 ACTION="$1"
 shift 2>/dev/null
+
+# Print the value of key $1 from $ENV_FILE. The file is NOT sourced: it lives in
+# /etc/solarnode, which the unprivileged solar user can write to, while this
+# script runs as root via sudo. Only the first matching line is used, with any
+# surrounding quotes removed.
+env_value () {
+	[ -r "$ENV_FILE" ] || return 0
+	awk -F= '$1 ~ /^[ \t]*'"$1"'$/ {
+		sub(/^[ \t]+/, "", $2)
+		gsub(/(^"|"$|^'"'"'|'"'"'$)/, "", $2)
+		print $2
+	}' "$ENV_FILE" | head -1
+}
+
+# Print the name (hciN) of the first adapter that provides GattManager1, or hci0
+# if none can be found (for example when bluetoothd is not running).
+find_adapter () {
+	local p
+	for p in $(busctl tree --list org.bluez 2>/dev/null | grep -E '^/org/bluez/hci[0-9]+$' | sort -V); do
+		if busctl introspect org.bluez "$p" 2>/dev/null | grep -q 'org.bluez.GattManager1'; then
+			echo "${p##*/}"
+			return 0
+		fi
+	done
+	echo hci0
+}
+
+ADAPTER="$(env_value SN_BT_SETUP_PERIPHERAL_ADAPTER)"
+if [ -n "$ADAPTER" ] && ! [[ $ADAPTER =~ ^hci[0-9]+$ ]]; then
+	echo "Ignoring invalid SN_BT_SETUP_PERIPHERAL_ADAPTER value in $ENV_FILE." 1>&2
+	ADAPTER=""
+fi
+if [ -z "$ADAPTER" ]; then
+	ADAPTER="$(find_adapter)"
+fi
 
 # Adapter properties are changed through bluetoothd over D-Bus, the same path
 # the peripheral script uses, so bluetoothd's view of the adapter stays
@@ -100,7 +139,13 @@ do_disable () {
 }
 
 do_restart () {
-	if systemctl restart "$UNIT"; then
+	# try-restart, not restart: the radio is gated by the plugin, so a restart
+	# must never start a peripheral that has intentionally been left stopped.
+	if ! unit_active; then
+		echo "Bluetooth setup radio is not enabled; nothing to restart."
+		exit 0
+	fi
+	if systemctl try-restart "$UNIT"; then
 		echo "Bluetooth setup radio restarted."
 	else
 		echo "Unable to restart $UNIT." 1>&2

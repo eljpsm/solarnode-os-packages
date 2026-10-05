@@ -27,7 +27,15 @@ needed, normally by the `net.solarnetwork.node.setup.bluetooth` SolarNode plugin
 | `status`  | Prints `active`, `enabled`, `discoverable`, `powered` (`true`/`false`) and `adapter` as `key: value` lines.     |
 | `enable`  | Starts the peripheral service. The peripheral powers the adapter and makes it discoverable and pairable itself. |
 | `disable` | Stops the peripheral service and turns the adapter off (not discoverable, not pairable, not powered).           |
-| `restart` | Restarts the peripheral service.                                                                                |
+| `restart` | Restarts the peripheral service if it is running. It never starts a stopped peripheral.                        |
+
+The helper selects the adapter the same way the peripheral does: the
+`SN_BT_SETUP_PERIPHERAL_ADAPTER` value from `/etc/solarnode/bluetooth-setup.env`
+if it is set and looks like `hciN`, otherwise the first adapter that provides
+`org.bluez.GattManager1`, otherwise `hci0`. Because the helper runs as root and
+`/etc/solarnode` is writable by the `solar` user, the helper parses that file
+for the one value rather than sourcing it, and ignores any value that is not an
+adapter name.
 
 To keep the peripheral enabled and always running, create
 `/etc/default/solarnode-bluetooth-setup` **before installing the package** with:

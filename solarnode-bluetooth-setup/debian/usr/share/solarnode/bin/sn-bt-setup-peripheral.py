@@ -679,6 +679,9 @@ def find_adapter(bus):
     Honors ``SN_BT_SETUP_PERIPHERAL_ADAPTER`` (e.g. ``SN_BT_SETUP_PERIPHERAL_ADAPTER=hci0``) to disambiguate
     when multiple adapters are present; otherwise returns the first adapter
     that advertises org.bluez.GattManager1.
+
+    The solarcfg helper (cfg.d/bluetooth.sh) applies the same rule when it
+    reports or turns off the adapter, so keep the two in step.
     """
     remote_om = dbus.Interface(bus.get_object(BUS_NAME, "/"), DBUS_OM_IFACE)
     objects = remote_om.GetManagedObjects()
