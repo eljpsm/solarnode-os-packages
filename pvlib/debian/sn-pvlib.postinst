@@ -20,8 +20,8 @@ if [ ! -d "$PVLIB_VENV" ]; then
 	python3 -m venv "$PVLIB_VENV"
 fi
 
-# install pvlib
-$PVLIB_VENV/bin/pip3 install --upgrade --upgrade-strategy only-if-needed --prefer-binary pvlib
+# install pvlib (0.12+ required for bifacial night-time ground irradiance fix)
+$PVLIB_VENV/bin/pip3 install --upgrade --upgrade-strategy only-if-needed --prefer-binary 'pvlib>=0.12'
 
 # clear package cache to free space
 # pip cache not avail in Deb 10 to do: $PVLIB_VENV/bin/python3 -m pip cache purge

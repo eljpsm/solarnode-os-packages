@@ -1,5 +1,5 @@
 NAME = solarnode-app-datumfilters-pvlib
-VERSION = 2.1.0-1
+VERSION = 2.4.0-1
 PATHS = var
 SN_BUILD_ROOT = ${CURDIR}/solarnetwork-build
 SN_IVY_FILE = ${CURDIR}/../ivy.xml
@@ -19,7 +19,7 @@ pkg : app table
 		--url "https://github.com/SolarNetwork/solarnode-os-packages/tree/develop/$(NAME)/debian" \
 		-f \
 		-d 'solarnode-app-core (>= 4.0)' \
-		-d 'sn-pvlib (>= 1.2)' \
+		-d 'sn-pvlib (>= 1.3)' \
 		--chdir $(DEB_BUILD_ROOT) \
 		$(PATHS)
 

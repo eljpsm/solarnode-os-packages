@@ -1,6 +1,6 @@
 NAME = sn-pvlib
 DIST = 
-VERSION = 1.2.0-1$(if $(DIST),+$(DIST),)
+VERSION = 1.3.0-1$(if $(DIST),+$(DIST),)
 PATHS = usr var
 
 deb : prep
